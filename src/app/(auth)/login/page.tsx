@@ -5,10 +5,12 @@ import { User, GraduationCap, FileText, Lock, LogIn, Eye, EyeOff } from "lucide-
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import { useAppStore } from "@/store/appState";
+import { div } from "framer-motion/client";
 const LoginPage = () => {
     const isDark = useAppStore((state) => state.isDark); //ป้องกัน store ใหญ่ จะบบจะได้ดึงจัวที่ต้องการมาใช้เท่านั้น 
     const setTheme = useAppStore((state) => state.setTheme);
     const [onSubmit, setOnSubmit] = useState(false);
+    const [connection, setConnection] = useState(false);
 
     useEffect(() => {
         const themeStore = localStorage.getItem('isDark') === 'true';
@@ -64,12 +66,20 @@ const LoginPage = () => {
         const fetchHello = async () => {
             try {
                 const response = await Axios.get('/');
+                setConnection(true);
                 console.log(response.data);
             } catch (error) {
-                console.error(error);
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'เกิดข้อผิดพลาด',
+                    theme: isDark ? 'dark' : 'light',
+                    text: "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้"
+                })
+                console.error("Connection error:", error);
+                setConnection(false);
             }
         }
-
         fetchHello();
     }, []);
 
@@ -136,7 +146,8 @@ const LoginPage = () => {
                             <button
                                 type="submit"
                                 className="btn btn-primary !rounded-box w-full"
-                                disabled={onSubmit}
+                                disabled={onSubmit || !connection}
+                                
                             >
                                 {onSubmit && <span className="loading loading-spinner"></span>}
                                 {onSubmit ? "กำลังเข้าสู่ระบบ..." : "เข้าสู่ระบบ"}

@@ -16,26 +16,28 @@ const AttendanceTable = ({ formData, onDataChange, onOpenModal }: AttendanceTabl
   // แปลงข้อมูลจาก API เป็นรูปแบบตาราง
   useEffect(() => {
     if (formData && formData.formData) {
-      const convertedData: AttendanceRow[] = Object.values(formData.formData).map((item: any, index: number) => ({
+      // deep clone เพื่อให้ React มองว่า state เปลี่ยน
+      const convertedData: AttendanceRow[] = Object.values(formData.formData).map((item: any) => ({
         id: item.class_level,
         classLevel: item.class_level.toString(),
         classLevelTh: item.class_level_th,
-        totalMale: item.amount_student_male,
-        totalFemale: item.amount_student_female,
-        totalCount: item.amount_student_count,
-        comeMale: item.amount_student_male,
-        comeFemale: item.amount_student_female,
-        comeCount: item.amount_student_female,
-        notComeMale: 0,
-        notComeFemale: 0,
-        notComeCount: 0,
-        absent: 0,
-        leave: 0,
-        sick: 0,
-        late: 0,
-        note: ''
+        totalMale: item.amount_male,
+        totalFemale: item.amount_female,
+        totalCount: item.amount_count,
+        comeMale: item.come_male ?? item.amount_male,      // fallback
+        comeFemale: item.come_female ?? item.amount_female,
+        comeCount: item.come_count ?? item.amount_count,
+        notComeMale: item.not_come_male ?? 0,
+        notComeFemale: item.not_come_female ?? 0,
+        notComeCount: item.not_come_count ?? 0,
+        absent: item.absent ?? 0,      // <-- เอาค่าจริงจาก formData
+        leave: item.leave ?? 0,
+        sick: item.sick ?? 0,
+        late: item.late ?? 0,
+        note: ''   // หรือเอาจาก item.remark ถ้ามี
       }));
-      setData(convertedData);
+
+      setData([...convertedData]); // spread เพื่อให้ array ใหม่ → React มองว่า state เปลี่ยน
     }
   }, [formData]);
 
@@ -45,20 +47,20 @@ const AttendanceTable = ({ formData, onDataChange, onOpenModal }: AttendanceTabl
       onDataChange(data);
     }
   }, [data, onDataChange]);
-const shortClass: Record<string, string> = {
-  1: "อ.1",
-  2: "อ.2",
-  3: "อ.3",
-  4: "ป.1",
-  5: "ป.2",
-  6: "ป.3",
-  7: "ป.4",
-  8: "ป.5",
-  9: "ป.6",
-  10: "ม.1",
-  11: "ม.2",
-  12: "ม.3"
-};
+  const shortClass: Record<string, string> = {
+    1: "อ.1",
+    2: "อ.2",
+    3: "อ.3",
+    4: "ป.1",
+    5: "ป.2",
+    6: "ป.3",
+    7: "ป.4",
+    8: "ป.5",
+    9: "ป.6",
+    10: "ม.1",
+    11: "ม.2",
+    12: "ม.3"
+  };
 
   return (
     <div className="overflow-x-auto border border-base-content/5 bg-base-100">
@@ -112,7 +114,7 @@ const shortClass: Record<string, string> = {
               <td className="text-center">
                 {item.totalCount}
               </td>
-              
+
               {/* มา */}
               <td className="text-center">
                 {item.comeMale}
@@ -151,13 +153,14 @@ const shortClass: Record<string, string> = {
 
               {/* หมายเหตุ */}
               <td className="text-center">
-                <div 
-                  className="min-w-20 min-h-10 bg-base-300 rounded-xl cursor-pointer text-center p-2 hover:bg-base-content/10 transition-colors" 
-                  title={`คลิกเพื่อกรอกข้อมูล ${item.classLevelTh}`} 
+                <button
+                  type="button"
+                  className="btn btn-sm btn-primary btn-soft rounded-lg px-4 py-2 transition-colors font-semibold"
+                  title={`คลิกเพื่อกรอกข้อมูล ${item.classLevelTh}`}
                   onClick={() => onOpenModal(item.id)}
                 >
-                  <div className="whitespace-nowrap font-semibold">กรอก</div>
-                </div>
+                  จัดการ
+                </button>
               </td>
             </tr>
           ))}
