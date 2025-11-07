@@ -6,7 +6,7 @@ const SECRET_KEY = process.env.SECRET_KEY || 'mysecretkey'
 
 interface JWTPayload {
   id: string
-  email: string
+  username: string
   role?: string
 }
 
@@ -50,7 +50,7 @@ export async function middleware(request: NextRequest) {
     // เพิ่ม user data เข้า headers
     const requestHeaders = new Headers(request.headers)
     requestHeaders.set('x-user-id', payload.id)
-    requestHeaders.set('x-user-email', payload.email)
+    requestHeaders.set('x-user-username', payload.username)
     if (payload.role) {
       requestHeaders.set('x-user-role', payload.role)
     }

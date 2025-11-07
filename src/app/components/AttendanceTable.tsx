@@ -1,19 +1,13 @@
 'use client'
 import { useState, useEffect } from "react";
 import { AttendanceRow } from "@/types/attendance";
-import { div } from "framer-motion/client";
-
 interface AttendanceTableProps {
   formData: any;
   onDataChange?: (data: AttendanceRow[]) => void;
   onOpenModal: (classId?: number) => void;
 }
-
-const AttendanceTable = ({ formData, onDataChange, onOpenModal }: AttendanceTableProps) => {
-  // เก็บข้อมูลทั้งหมดลง state
+const AttendanceTable = ({ formData, onOpenModal }: AttendanceTableProps) => {
   const [data, setData] = useState<AttendanceRow[]>([]);
-
-  // แปลงข้อมูลจาก API เป็นรูปแบบตาราง
   useEffect(() => {
     if (formData && formData.formData) {
       // deep clone เพื่อให้ React มองว่า state เปลี่ยน
@@ -40,13 +34,6 @@ const AttendanceTable = ({ formData, onDataChange, onOpenModal }: AttendanceTabl
       setData([...convertedData]); // spread เพื่อให้ array ใหม่ → React มองว่า state เปลี่ยน
     }
   }, [formData]);
-
-  // ส่งข้อมูลกลับไปยัง parent component เมื่อ data เปลี่ยน
-  useEffect(() => {
-    if (onDataChange && data.length > 0) {
-      onDataChange(data);
-    }
-  }, [data, onDataChange]);
   const shortClass: Record<string, string> = {
     1: "อ.1",
     2: "อ.2",
@@ -96,7 +83,7 @@ const AttendanceTable = ({ formData, onDataChange, onOpenModal }: AttendanceTabl
         </thead>
         <tbody>
           {data && data.map((item, index) => (
-            <tr key={item.id} className={index % 2 === 0 ? "bg-base-200" : ''}>
+            <tr key={index} className={` ${index % 2 === 0 ? "bg-gray-100 dark:bg-white/10" : "bg-base-100"}`}>
               {/* ชั้นเรียน */}
               <td
                 className="bg-base-100 dark:bg-base-200 sticky left-0 z-10 whitespace-nowrap"

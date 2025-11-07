@@ -17,15 +17,14 @@ type StudentData = {
 type LeaveStudentProps = {
   classLevelName: string;
   students: StudentData[];
+  disabled?: boolean;
   onSelectLeave: (
     studentId: number,
-    gender: string,
     status: AttendanceStatus,
-    newAttendanceMap: Record<number, AttendanceStatus>
   ) => void;
 };
 
-const LeaveStudent = ({ classLevelName, students, onSelectLeave }: LeaveStudentProps) => {
+const LeaveStudent = ({ classLevelName, students, onSelectLeave, disabled = false }: LeaveStudentProps) => {
   // local state แยกจาก parent
   const [localAttendance, setLocalAttendance] = useState<Record<number, AttendanceStatus>>(() => {
     const initial: Record<number, AttendanceStatus> = {};
@@ -61,7 +60,7 @@ const LeaveStudent = ({ classLevelName, students, onSelectLeave }: LeaveStudentP
 
     const student = students.find(s => s.id === studentId);
     if (student) {
-      onSelectLeave(student.id, student.gender, status, newAttendance);
+      onSelectLeave(student.id, status);
     }
   };
 
@@ -87,9 +86,8 @@ const LeaveStudent = ({ classLevelName, students, onSelectLeave }: LeaveStudentP
           .map((student, index) => (
             <div
               key={student.id}
-              className={`flex items-center justify-between p-3 rounded-lg border transition-all duration-200 ${
-                localAttendance[student.id] ? getStatusColor(localAttendance[student.id]) : getStatusColor("come")
-              }`}
+              className={`flex items-center justify-between p-3 rounded-lg border transition-all duration-200 ${localAttendance[student.id] ? getStatusColor(localAttendance[student.id]) : getStatusColor("come")
+                }`}
             >
               <div className="flex items-center gap-3 flex-1 min-w-0">
                 <span className="font-medium min-w-8 text-sm">{index + 1}.</span>
@@ -104,9 +102,10 @@ const LeaveStudent = ({ classLevelName, students, onSelectLeave }: LeaveStudentP
               </div>
 
               <select
+                disabled={disabled}
                 value={localAttendance[student.id] || "come"}
                 onChange={(e) => handleStatusChange(student.id, e.target.value as AttendanceStatus)}
-                className="select w-24 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-base-200 cursor-pointer"
+                className={`select w-24 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-base-200 ${disabled ? "cursor-not-allowed" : "cursor-pointer"} `}
               >
                 <option value="come">มาเรียน</option>
                 <option value="absent">ขาด</option>

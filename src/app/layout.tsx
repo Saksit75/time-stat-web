@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Sarabun } from "next/font/google";
 import "./globals.css";
+import { Suspense } from "react";
 // 
 const thaiSarabun = Sarabun({
   weight: ['100', '200', '300', '400', '500', '600', '700', '800'],

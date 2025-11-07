@@ -7,16 +7,20 @@ import Swal from 'sweetalert2';
 import Axios from '@/lib/axios';
 import { useAppStore } from '@/store/appState';
 import { AttendanceRow, FormApiResponse } from '@/types/attendance';
-import { useRouter } from 'next/navigation';
+
+// 🧩 Components
 import AttendanceTable from '@/app/components/AttendanceTable';
 import MyDatePicker from '@/app/components/MyDatePicker';
 import Selecter from '@/app/components/Selecter';
 import BackButton from '@/app/components/BackButton';
 import Modal from '@/app/components/Modal';
 import LeaveStudent from '@/app/components/LeaveStudent';
+import { useParams,useRouter } from 'next/navigation';
 
-export default function Attendance() {
+export default function AttendanceEdit() {
+  const params = useParams();
   const router = useRouter();
+  const { attendanceId } = params;
   // ---------- 🧩 TYPES ----------
   type AttendanceStatus = 'come' | 'absent' | 'leave' | 'sick' | 'late';
 
@@ -54,9 +58,15 @@ export default function Attendance() {
 
   type TempDataFormType = FormApiResponse | null;
 
+  type TeacherType = {
+    id: number | null;
+    title: string;
+    firstName: string;
+    lastName: string;
+  }
   const isDark = useAppStore((state) => state.isDark);
 
-  const [teacherList, setTeacherList] = useState<any[]>([]);
+  const [teacherList, setTeacherList] = useState<TeacherType[]>([]);
   const [studentsByClass, setStudentsByClass] = useState<StudentsByClassType | null>(null);
   const [dataForm, setDataForm] = useState<FormApiResponse | null>(null);
   const [tempDataForm, setTempDataForm] = useState<TempDataFormType>(null);
@@ -95,13 +105,6 @@ export default function Attendance() {
     setIsModalOpen(false);
     setTempDataForm(null);
   };
-
-  // useEffect(() => {
-  //   if (selectClass !== null && dataForm?.formData) {
-  //     const classData: any = dataForm.formData[selectClass.toString()];
-  //     if (classData) setStudentsByClass(classData);
-  //   }
-  // }, [dataForm, selectClass]);
 
   const onSelectLeave = (
     studentId: number,
@@ -173,7 +176,6 @@ export default function Attendance() {
     });
   };
 
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -189,20 +191,18 @@ export default function Attendance() {
     const result = await Swal.fire({
       icon: 'question',
       title: 'ยืนยันการบันทึกข้อมูล',
-      text: 'คุณแน่ใจหรือไม่ว่าต้องการบันทึกข้อมูลทั้งหมด?',
+      text: 'คุณแน่ใจหรือไม่ว่าต้องการบันทึกการแก้ไขข้อมูลทั้งหมด?',
       showCancelButton: true,
       confirmButtonText: 'บันทึกข้อมูล',
       cancelButtonText: 'ยกเลิก',
       theme: isDark ? 'dark' : 'light',
     });
-
     if (!result.isConfirmed) {
       return;
     }
-
     try {
       const submitData = { ...dataForm, teacher: selectedTeacher };
-      const res = await Axios.post('/time-stat/create-time-stat', submitData);
+      const res = await Axios.put(`/time-stat/update-time-stat/${attendanceId}`, submitData);
       if (res.data.status === 'error') throw new Error(res.data.message);
       Swal.fire({
         icon: 'success',
@@ -211,7 +211,7 @@ export default function Attendance() {
         showConfirmButton: false,
         theme: isDark ? 'dark' : 'light',
       }).then(() => {
-        router.push('/attendance-his');
+        router.push(`/attendance-his/${attendanceId}`);
       });
     } catch (error: any) {
       const msg = error.response?.data?.error || error.message || 'ไม่สามารถบันทึกข้อมูลได้';
@@ -223,81 +223,55 @@ export default function Attendance() {
       });
     }
   };
+  const getFormTimeStat = async () => {
+    try {
+      const res = await Axios.get(`/time-stat/time-stat-his-detail/${attendanceId}`);
+      setDataForm(res.data.data);
 
-  const handleClear = async () => {
-    await Swal.fire({
-      icon: 'warning',
-      title: 'ยืนยันการล้างข้อมูล',
-      text: 'คุณแน่ใจหรือไม่ว่าต้องการล้างข้อมูลทั้งหมด?',
-      showCancelButton: true,
-      confirmButtonText: 'ใช่ ล้างข้อมูล',
-      cancelButtonText: 'ยกเลิก',
-      theme: isDark ? 'dark' : 'light',
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          const res = await getFormTimeStat();
-          if (res) setTempDataForm(null);
-
-          Swal.fire({
-            icon: 'success',
-            title: 'ล้างข้อมูลเรียบร้อย',
-            timer: 1500,
-            showConfirmButton: false,
-            theme: isDark ? 'dark' : 'light',
-          });
-        } catch (error) {
-          console.error('Error clearing attendance data:', error);
-          Swal.fire({
-            icon: 'error',
-            title: 'เกิดข้อผิดพลาด',
-            timer: 1500,
-            showConfirmButton: false,
-            theme: isDark ? 'dark' : 'light',
-          });
-        }
-      }
-    });
+      return res.data.data.teacher;
+    } catch {
+      setDataForm(null);
+      return null;
+    }
   };
 
-  const getTeacherList = async () => {
+  const getTeacherList = async (teacherId: number) => {
     try {
-      const res: AxiosResponse<any> = await Axios.get('/teachers?status=in');
+      const res: AxiosResponse<any> = await Axios.get(`/teachers`);
+
+      const teacher = res.data.data.teachers;
+
       setTeacherList(
-        res.data.data.teachers.map((t: any) => ({
+        teacher.map((t: any) => ({
           id: t.id,
           title: t.title_relation?.title_th || '',
           firstName: t.first_name,
           lastName: t.last_name,
         }))
       );
+
+      setSelectedTeacher(String(teacherId) || "");
     } catch {
       setTeacherList([]);
     }
   };
 
-  const getFormTimeStat = async () => {
-    try {
-      const res = await Axios.get('/time-stat/get-form-time-stat');
-      setDataForm(res.data.data);
-      return true;
-    } catch {
-      setDataForm(null);
-    }
-  };
-
   useEffect(() => {
-    getTeacherList();
-    getFormTimeStat();
+    const fetchData = async () => {
+      const teacherId = await getFormTimeStat();
+      if (teacherId) {
+        await getTeacherList(teacherId);
+      }
+    };
+    fetchData();
   }, []);
-
   return (
     <div className="container mx-auto px-4 py-18 min-h-screen">
       <BackButton />
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <h1 className="text-4xl font-black text-center text-primary">
-          ข้อมูลการมาเรียน
+          แก้ไขข้อมูลการมาเรียน
         </h1>
 
         <MyDatePicker
@@ -305,6 +279,7 @@ export default function Attendance() {
           onDateChange={(date) =>
             setDataForm((prev: any) => (prev ? { ...prev, date } : { date }))
           }
+          disabled={true}
         />
 
         <AttendanceTable
@@ -312,6 +287,7 @@ export default function Attendance() {
           onOpenModal={onOpenModal}
         />
 
+        {/* 🧑‍🏫 เลือกคุณครู */}
         <div className="flex items-center justify-center gap-3 w-full">
           <label htmlFor="teacher-select" className="whitespace-nowrap text-lg">
             คุณครู : <span className="text-red-500">*</span>
@@ -321,7 +297,7 @@ export default function Attendance() {
             id="teacher-select"
             value={selectedTeacher}
             onChange={setSelectedTeacher}
-            options={teacherList.map((t) => ({
+            options={teacherList.map((t: any) => ({
               value: t.id.toString(),
               label: `${t.title} ${t.firstName} ${t.lastName}`,
             }))}
@@ -330,14 +306,7 @@ export default function Attendance() {
 
         <div className="flex items-center justify-end gap-2">
           <button type="submit" className="btn btn-primary !rounded-box">
-            <Save className='w-4 h-4' /> บันทึก
-          </button>
-          <button
-            type="button"
-            onClick={handleClear}
-            className="btn btn-warning !rounded-box"
-          >
-           <Eraser className='w-4 h-4' /> ล้าง 
+           <Save className='w-4 h-4' /> บันทึก 
           </button>
         </div>
       </form>

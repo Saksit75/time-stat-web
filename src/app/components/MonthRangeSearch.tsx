@@ -32,7 +32,14 @@ const MonthRangeSearch: React.FC<DateRangeSelectorProps> = ({ onSearch, onClear 
   const [endMonth, setEndMonth] = useState("")
   const [endYear, setEndYear] = useState("")
 
-  const handleSearch = () => {
+  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (Number(startYear) > Number(endYear)) {
+      setStartYear("");
+      setEndYear("");
+      return;
+    }
+
     if (onSearch) {
       onSearch({ startMonth, startYear, endMonth, endYear })
     }
@@ -49,7 +56,7 @@ const MonthRangeSearch: React.FC<DateRangeSelectorProps> = ({ onSearch, onClear 
   }
 
   return (
-    <div className="bg-base-200 rounded-lg shadow-md p-6 md:p-8 w-full">
+    <form onSubmit={handleSearch} className="bg-base-200 rounded-lg shadow-md p-6 md:p-8 w-full">
       <h2 className="text-lg md:text-xl font-semibold  mb-6">เลือกช่วงเวลา</h2>
 
       {/* Form Layout */}
@@ -57,10 +64,11 @@ const MonthRangeSearch: React.FC<DateRangeSelectorProps> = ({ onSearch, onClear 
         {/* Start Month */}
         <div className="flex flex-col gap-2 w-full">
           <label htmlFor="start-month" className="text-sm font-medium ">
-            เดือนเริ่มต้น
+            เดือนเริ่มต้น <span className="text-error">*</span>
           </label>
           <select
             id="start-month"
+            required
             value={startMonth}
             onChange={(e) => setStartMonth(e.target.value)}
             className="select w-full border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 px-3 py-2"
@@ -77,14 +85,19 @@ const MonthRangeSearch: React.FC<DateRangeSelectorProps> = ({ onSearch, onClear 
         {/* Start Year */}
         <div className="flex flex-col gap-2 w-full">
           <label htmlFor="start-year" className="text-sm font-medium ">
-            ปีเริ่มต้น
+            ปีเริ่มต้น  <span className="text-error">*</span>
           </label>
           <input
+            required
             id="start-year"
             type="number"
-            placeholder="2568"
             value={startYear}
-            onChange={(e) => setStartYear(e.target.value)}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (/^\d{0,4}$/.test(val)) {
+                setStartYear(val);
+              }
+            }}
             className="input w-full border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 px-3 py-2"
           />
         </div>
@@ -101,10 +114,11 @@ const MonthRangeSearch: React.FC<DateRangeSelectorProps> = ({ onSearch, onClear 
         {/* End Month */}
         <div className="flex flex-col gap-2 w-full">
           <label htmlFor="end-month" className="text-sm font-medium ">
-            เดือนสิ้นสุด
+            เดือนสิ้นสุด  <span className="text-error">*</span>
           </label>
           <select
             id="end-month"
+            required
             value={endMonth}
             onChange={(e) => setEndMonth(e.target.value)}
             className="select w-full border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 px-3 py-2"
@@ -121,35 +135,38 @@ const MonthRangeSearch: React.FC<DateRangeSelectorProps> = ({ onSearch, onClear 
         {/* End Year */}
         <div className="flex flex-col gap-2 w-full">
           <label htmlFor="end-year" className="text-sm font-medium ">
-            ปีสิ้นสุด
+            ปีสิ้นสุด  <span className="text-error">*</span>
           </label>
           <input
+            required
             id="end-year"
             type="number"
-            placeholder="2568"
             value={endYear}
-            onChange={(e) => setEndYear(e.target.value)}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (/^\d{0,4}$/.test(val)) {
+                setEndYear(val);
+              }
+            }}
             className="input w-full border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 px-3 py-2"
           />
         </div>
       </div>
-
-      {/* Action Buttons */}
       <div className="flex flex-col sm:flex-row gap-3 mt-8 justify-end">
         <button
-          onClick={handleClear}
-          className="px-6 py-2.5 border border-gray-300 rounded-md  font-medium hover:bg-gray-50 transition-colors"
-        >
-          ล้างข้อมูล
-        </button>
-        <button
-          onClick={handleSearch}
-          className="px-6 py-2.5 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition-colors shadow-sm"
+          className="btn btn-primary rounded-md font-medium"
         >
           ค้นหา
         </button>
+        <button
+          type="button"
+          onClick={handleClear}
+          className="btn btn-outline rounded-md  font-medium"
+        >
+          ล้างข้อมูล
+        </button>
       </div>
-    </div>
+    </form>
   )
 }
 

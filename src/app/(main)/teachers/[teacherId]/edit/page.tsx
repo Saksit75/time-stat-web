@@ -35,8 +35,26 @@ const TeacherEdit = () => {
         status: "",
     });
     const [photoUrl, setPhotoUrl] = useState<string | null>(null);
-
-    // ✅ ดึงข้อมูลครูมาเติมในฟอร์ม
+    const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+    });
+    const idCardChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        const numericValue = value.replace(/\D/g, "");
+        if (numericValue.length <= 13) {
+            setFormData((prev) => ({ ...prev, idCard: numericValue }));
+        } else {
+            Toast.fire({
+                icon: 'warning',
+                title: 'เลขบัตรประชาชนไม่เกิน 13 ตัว',
+                theme: isDark ? "dark" : "light",
+            })
+        }
+    };
     useEffect(() => {
         const fetchTeacher = async () => {
             try {
@@ -390,7 +408,8 @@ const TeacherEdit = () => {
                                     type="text"
                                     name="idCard"
                                     value={formData.idCard}
-                                    onChange={handleChange}
+                                    onChange={idCardChange}
+                                    min={1}
                                     className="bg-base-100 p-2 rounded border w-full"
                                 />
                             </div>
@@ -416,7 +435,7 @@ const TeacherEdit = () => {
                                 />
                             </div>
 
-                            <div className="flex-1 flex flex-col gap-2">
+                            {/* <div className="flex-1 flex flex-col gap-2">
                                 <span className="font-semibold">Role <span className="text-red-500">*</span></span>
                                 <select
                                     name="role"
@@ -429,7 +448,7 @@ const TeacherEdit = () => {
                                     <option value="g">ทั่วไป</option>
                                     <option value="a">แอดมิน</option>
                                 </select>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
 

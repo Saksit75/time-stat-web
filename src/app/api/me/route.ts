@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const { payload } = await jwtVerify(token, new TextEncoder().encode(SECRET_KEY))
-    return NextResponse.json({ userId: (payload as any).id })
+    return NextResponse.json({ userId: (payload as any).id,userName: (payload as any).username, userRole: (payload as any).role })
   } catch {
     return NextResponse.json({ userId: null })
   }

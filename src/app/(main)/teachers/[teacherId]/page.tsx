@@ -188,10 +188,10 @@ const TeacherView = async (props: Props) => {
                                     <span className="font-semibold">Username</span>
                                     <p className="mt-1 bg-base-100 p-2 rounded border min-h-[42px]">{teacherData.username}</p>
                                 </div>
-                                <div className="flex-1 flex flex-col gap-2">
+                                {/* <div className="flex-1 flex flex-col gap-2">
                                     <span className="font-semibold">Role</span>
                                     <p className="mt-1 bg-base-100 p-2 rounded border min-h-[42px]">{teacherData.role === "a" ? "แอดมิน" : teacherData.role === "g" ? "ทั่วไป" : "-"}</p>
-                                </div>
+                                </div> */}
                             </div>
                         </div>
 
