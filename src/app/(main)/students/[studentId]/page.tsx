@@ -54,7 +54,7 @@ const StudentView = async (props: Props) => {
 
   // แปลงเป็น camelCase สำหรับ UI
   const studentData: StudentType = {
-    photo: student.photo ? `${process.env.NEXT_PUBLIC_API_URL}/${student.photo.replace(/\\/g, '/')}` : null,
+    photo: student.photo || null,
     title: student.title_relation?.title_th || "-",
     firstName: student.first_name,
     lastName: student.last_name,
@@ -62,7 +62,7 @@ const StudentView = async (props: Props) => {
     classLevel: student.class_level_relation?.class_level_th || "-",
     studentNumber: String(student.student_number),
     studentId: student.student_id,
-    detail: student.detail || "-",
+    detail: student.detail || "",
     status: student.status,
     idCard: student.id_card || "-",
   };

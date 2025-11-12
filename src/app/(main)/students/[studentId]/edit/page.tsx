@@ -41,9 +41,7 @@ const StudentEdit = () => {
             try {
                 const resStudent = await Axios.get(`/students/${studentId}`);
                 const studentData = resStudent.data.data;
-                const studentPhoto = studentData.photo
-                    ? `${process.env.NEXT_PUBLIC_API_URL}/${studentData.photo.replace(/\\/g, '/')}`
-                    : null;
+                const studentPhoto = studentData.photo || null;
                 setFormData({
                     title: studentData.title_relation?.id || "",
                     firstName: studentData.first_name || "",
@@ -312,7 +310,7 @@ const StudentEdit = () => {
                         <div className="flex flex-col gap-4">
                             <div className="flex flex-col md:flex-row gap-4">
                                 <div className="flex-1 flex flex-col gap-2">
-                                    <span className="font-semibold">เลขประชาชน <span className="text-red-500">*</span></span>
+                                    <span className="font-semibold">เลขประชาชน</span>
                                     <input
                                         type="text"
                                         name="idCard"
@@ -320,12 +318,11 @@ const StudentEdit = () => {
                                         onChange={idCardChange}
                                         className="bg-base-100 p-2 rounded border w-full"
                                         min={1}
-                                        required
                                     />
                                 </div>
 
                                 <div className="flex-1 flex flex-col gap-2">
-                                    <span className="font-semibold">เลขประจำตัวนักเรียน <span className="text-red-500">*</span></span>
+                                    <span className="font-semibold">เลขประจำตัวนักเรียน</span>
                                     <input
                                         type="text"
                                         name="studentId"
@@ -333,7 +330,6 @@ const StudentEdit = () => {
                                         onChange={handleChange}
                                         className="bg-base-100 p-2 rounded border w-full"
                                         min={1}
-                                        required
                                     />
                                 </div>
                             </div>

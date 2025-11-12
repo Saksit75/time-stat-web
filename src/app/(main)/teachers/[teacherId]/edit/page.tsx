@@ -60,9 +60,10 @@ const TeacherEdit = () => {
             try {
                 const resTeacher = await Axios.get(`/teachers/${teacherId}`);
                 const TeacherData = resTeacher.data.data;
-                const teacherPhoto = TeacherData.photo
-                    ? `${process.env.NEXT_PUBLIC_API_URL}/${TeacherData.photo.replace(/\\/g, '/')}`
-                    : null;
+                const teacherPhoto = TeacherData.photo || null;
+                // const teacherPhoto = TeacherData.photo
+                //     ? `${process.env.NEXT_PUBLIC_API_URL}/${TeacherData.photo.replace(/\\/g, '/')}`
+                //     : null;
                 setFormData({
                     title: TeacherData.title_relation?.id || "",
                     firstName: TeacherData.first_name || "",
@@ -156,7 +157,6 @@ const TeacherEdit = () => {
         }
     };
 
-    // ✅ ส่งข้อมูล (PUT)
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         const result = await Swal.fire({
@@ -169,6 +169,10 @@ const TeacherEdit = () => {
             confirmButtonText: "ยืนยัน",
             cancelButtonText: "ยกเลิก",
             theme: isDark ? "dark" : "light",
+            preConfirm: () => {
+                Swal.showLoading();
+            },
+            allowOutsideClick: () => !Swal.isLoading()
         });
 
         if (!result.isConfirmed) {
@@ -260,9 +264,9 @@ const TeacherEdit = () => {
                     <div className="flex flex-col items-center gap-2">
                         <label htmlFor="teacherPhoto" className="w-40 h-40 border rounded overflow-hidden bg-base-100 flex items-center justify-center cursor-pointer">
                             {formData.photo ? (
-                                <img src={URL.createObjectURL(formData.photo)} alt="photo" className="w-full h-full object-cover" />
+                                <img src={URL.createObjectURL(formData.photo)} alt="photo" className="w-full h-full object-cover" /> //แสดงรูปภาพที่อัปโหลด
                             ) : photoUrl ? (
-                                <img src={photoUrl} alt="รูปภาพบุคลากร" className="w-full h-full object-cover" />
+                                <img src={photoUrl} alt="รูปภาพบุคลากร" className="w-full h-full object-cover" /> // แสดงรูปภาพจาก API
                             ) : (
                                 <span className="text-gray-400 text-sm">เลือกรูปใหม่</span>
                             )}

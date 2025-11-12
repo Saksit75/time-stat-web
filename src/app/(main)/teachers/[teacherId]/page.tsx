@@ -78,9 +78,10 @@ const TeacherView = async (props: Props) => {
         gender: teacher.gender,
         role: teacher.role,
     };
-    const teacherPhoto = teacherData.photo
-  ? `${process.env.NEXT_PUBLIC_API_URL}/${teacherData.photo.replace(/\\/g, '/')}`
-  : null;
+//     const teacherPhoto = teacherData.photo
+//   ? `${process.env.NEXT_PUBLIC_API_URL}/${teacherData.photo.replace(/\\/g, '/')}`
+//   : null;
+const teacherPhoto = teacher.photo || null;
 
     const statusColor = (status: string) => {
         switch (status) {

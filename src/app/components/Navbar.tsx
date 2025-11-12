@@ -107,7 +107,7 @@ const Navbar = () => {
     if (!userId) return <div>Loading...</div>
     return (
         <nav className="fixed top-0 left-0 w-full bg-gradient-to-r from-gray-500/30 via-gray-400/30 to-gray-500/30 backdrop-blur-xs flex items-center justify-between py-2 px-6 shadow-lg z-50">
-            <Link href="/" className="text-white text-lg font-bold tracking-wide">Time Stat</Link>
+            <Link href="/" className="tracking-wide"><img src="/favicon.ico" alt="" className="w-10 h-10" /></Link>
             <div className="flex gap-2 items-center">
 
                 <ThemeSwitch />
@@ -120,7 +120,7 @@ const Navbar = () => {
                     >
                         {
                             teacherPhoto ? (
-                                <img src={`${process.env.NEXT_PUBLIC_API_URL}/${teacherPhoto.replace(/\\/g, '/')}`} alt="Profile" className="w-[26px] h-[26px] object-cover rounded-full" />
+                                <img src={teacherPhoto} alt="Profile" className="w-[26px] h-[26px] object-cover rounded-full" />
                             ) : (
                                 <UserCircle2 size={26} />
                             )
