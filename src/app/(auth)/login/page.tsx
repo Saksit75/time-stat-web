@@ -42,12 +42,12 @@ const LoginPage = () => {
         try {
             setOnSubmit(true);
             const response = await Axios.post('/login', { username, password });
-            console.log("login status : ",response.status);
-            
-            if(response.status === 200){
-            router.push('/');
-            router.refresh() // Refresh เพื่อให้ middleware ทำงาน
-            }else{
+
+            if (response.status === 200) {
+                router.push('/');
+                router.refresh() // Refresh เพื่อให้ middleware ทำงาน
+                console.log("login status : ", response.status);
+            } else {
                 return
             }
 
@@ -149,7 +149,7 @@ const LoginPage = () => {
                                 type="submit"
                                 className="btn btn-primary !rounded-box w-full"
                                 disabled={onSubmit || !connection}
-                                
+
                             >
                                 {onSubmit && <span className="loading loading-spinner"></span>}
                                 {onSubmit ? "กำลังเข้าสู่ระบบ..." : "เข้าสู่ระบบ"}
