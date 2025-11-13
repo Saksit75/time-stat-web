@@ -45,6 +45,7 @@ const LoginPage = () => {
 
             if (response.status === 200) {
                 router.push('/');
+                window.location.href = '/'
                 router.refresh() // Refresh เพื่อให้ middleware ทำงาน
                 console.log("login status : ", response.status);
             } else {
