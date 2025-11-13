@@ -42,12 +42,14 @@ const LoginPage = () => {
         try {
             setOnSubmit(true);
             const response = await Axios.post('/login', { username, password });
-            // if(response.status === 200){
+            console.log("login status : ",response.status);
+            
+            if(response.status === 200){
             router.push('/');
             router.refresh() // Refresh เพื่อให้ middleware ทำงาน
-            // }else{
-            //     return
-            // }
+            }else{
+                return
+            }
 
         } catch (error: any) {
             setOnSubmit(false);
