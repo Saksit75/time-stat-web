@@ -79,7 +79,10 @@ const Navbar = () => {
     useEffect(() => {
         const fetchMe = async () => {
             try {
-                const res = await fetch('/api/me')  // ✅ ต้อง await
+                const res = await fetch('/api/me', {
+                    method: "GET",
+                    credentials: "include",   // ⬅️ สำคัญมาก!
+                })
                 const json = await res.json()
                 setUserId(json.userId)
                 setAppMenu(getMenu(json.userId))
@@ -91,18 +94,18 @@ const Navbar = () => {
     }, [])
     useEffect(() => {
         if (userId) {
-            const fetchPhoto = async () =>{
+            const fetchPhoto = async () => {
                 try {
                     const tPhoto = await Axios.get(`/teachers/photo/${userId}`)
                     setTeacherPhoto(tPhoto.data.data.photo)
-                }catch (error) {
+                } catch (error) {
                     setTeacherPhoto(null)
                 }
-             } 
-             fetchPhoto()  
+            }
+            fetchPhoto()
         }
-        
-    },[userId])
+
+    }, [userId])
 
     if (!userId) return <div>Loading...</div>
     return (
